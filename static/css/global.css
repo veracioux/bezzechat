@@ -1,0 +1,11 @@
+body {
+    font-family: Lato;
+}
+
+input[type="submit"] {
+    border: none;
+    border-radius: 0.2em;
+    padding: 0.5em;
+    background: #D1C4E9;
+    box-shadow: 2px 2px 4px #00000055;
+}
