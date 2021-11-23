@@ -1,0 +1,25 @@
+{
+  "name": "bezzechat",
+  "version": "0.1.0",
+  "description": "Zadatak za Evolt",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/veracioux/bezzechat.git"
+  },
+  "author": "Haris Gušić",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/veracioux/bezzechat/issues"
+  },
+  "homepage": "https://github.com/veracioux/bezzechat#readme",
+  "devDependencies": {
+    "eslint": "^8.3.0",
+    "eslint-plugin-html": "^6.2.0",
+    "prettier": "^2.4.1",
+    "stylelint": "^14.1.0",
+    "stylelint-config-standard": "^24.0.0"
+  }
+}
