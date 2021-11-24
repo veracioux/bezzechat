@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>BezzeChat</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/register.css' %}" />
+    </head>
+    <body>
+        <span style="font-size: 2em">Register</span>
+        <form action="/chat/" method="GET" id="register-form">
+            <label for="username">User name</label>
+            <input type="text" id="username" />
+            <label for="password">Password</label>
+            <input type="password" id="password" />
+            <input type="submit" value="Let's chat" />
+        </form>
+    </body>
+</html>
