@@ -1,0 +1,17 @@
+.message {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+}
+
+.message-bubble {
+    padding: 0.5em;
+    background: white;
+    border-radius: 0.5em;
+    box-shadow: 1px 1px 3px #0002;
+}
+
+.message-meta {
+    margin-left: 0.5em;
+}

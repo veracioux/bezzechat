@@ -8,18 +8,12 @@
         <link rel="stylesheet" href="{% static 'css/index.css' %}" />
     </head>
     <body>
-        <div class="container">
-            <div id="welcome">
-                <span>Welcome to BezzeChat.</span>
-                <form id="signin-form" method="POST">
-                    <input type="submit" formaction="login" value="Log in" />
-                    <input
-                        type="submit"
-                        formaction="register"
-                        value="Register"
-                    />
-                </form>
-            </div>
+        <div id="welcome">
+            <span>Welcome to BezzeChat.</span>
+            <form id="signin-form" method="POST">
+                <input type="submit" formaction="login" value="Log in" />
+                <input type="submit" formaction="register" value="Register" />
+            </form>
         </div>
     </body>
 </html>
