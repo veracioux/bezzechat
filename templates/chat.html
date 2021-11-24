@@ -5,10 +5,10 @@
         <title>BezzeChat</title>
         {% load static %}
         <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/chat-animations.css' %}" />
         <link rel="stylesheet" href="{% static 'css/chat.css' %}" />
         <link rel="stylesheet" href="{% static 'css/message.css' %}" />
     </head>
-
     <body>
         <div id="page-container">
             <div id="chat-container">
@@ -39,7 +39,9 @@
                     </div>
                     <textarea></textarea>
                 </div>
+                <div id="animation-overlay"></div>
             </div>
         </div>
     </body>
+    <script src="{% static 'js/chat.js' %}"></script>
 </html>
