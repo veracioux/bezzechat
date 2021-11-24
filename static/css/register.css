@@ -22,8 +22,7 @@ body {
     box-shadow: 2px 2px 8px #0005;
 }
 
-#register-form > input[type="text"],
-#register-form > input[type="password"] {
+.text {
     border-radius: 0.2em;
     border: none;
     text-align: center;

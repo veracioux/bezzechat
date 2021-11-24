@@ -9,12 +9,17 @@
     </head>
     <body>
         <span style="font-size: 2em">Register</span>
-        <form action="/chat/" method="GET" id="register-form">
+        <form action="./submit" method="POST" id="register-form">
+            {% csrf_token %}
             <label for="username">User name</label>
-            <input type="text" id="username" />
+            <input type="text" id="username" class="text" name="username" />
             <label for="password">Password</label>
-            <input type="password" id="password" />
+            <input type="password" id="password" class="text" name="password" />
             <input type="submit" value="Let's chat" />
+            <script>
+                let csrfToken = "{{ csrf_token }}";
+            </script>
         </form>
     </body>
+    <script src="{% static 'js/register.js' %}"></script>
 </html>
