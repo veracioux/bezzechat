@@ -15,3 +15,8 @@ class User(models.User):
             and len(username) <= 32
             and re.match("[a-zA-Z0-9_-]", username)
         )
+
+    @staticmethod
+    def is_password_valid(password):
+        """Test if `password` consists of valid characters."""
+        return len(password) >= 4 and len(password) <= 32

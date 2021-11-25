@@ -23,6 +23,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("register/", views.register, name="register"),
     path("register/submit", views.register_submit, name="register_submit"),
-    path("login/", views.login, name="register"),
+    path("login/", views.login, name="login"),
+    path("login/submit/", views.login_submit, name="login_submit"),
     path("chat/", views.chat, name="chat"),
 ]

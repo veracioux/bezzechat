@@ -1,25 +1,36 @@
 let registerForm = document.forms["register-form"];
 
-function createSubmitData() {
-    return {
-        method: "GET",
-        body: new URLSearchParams(new FormData(event.target)),
-    };
-}
-
+/**
+ * - Send form data
+ * - Receive cookie
+ * - Redirect to "/chat/"
+ */
 function onSubmit(event) {
     event.preventDefault();
-    let req = new XMLHttpRequest();
-    req.onload = function () {
-        alert(this.responseText);
-    };
-    req.open("POST", "./submit", true);
-    req.setRequestHeader("X-CSRFToken", csrfToken);
-    req.send(new URLSearchParams(new FormData(registerForm)));
+    fetch("./submit", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrfToken,
+        },
+        body: new FormData(registerForm),
+    })
+        .then(function (resp) {
+            return resp.json();
+        })
+        .then(function (json) {
+            if (!json.errors.length) {
+                document.cookie = json.cookie;
+                location.href = "/chat";
+            } else {
+                onDataError(json.errors);
+            }
+        });
 }
 
 function onDataError(errors) {
-    alert(errors);
+    // TODO
+    if (errors.contains("unique")) {
+    }
 }
 
-registerForm.addEventListener("submit", onSubmit /* TODO, { once: true }*/);
+registerForm.addEventListener("submit", onSubmit);
