@@ -93,13 +93,13 @@ def login_submit(request):
 
 
 def chat(request):
-    """The page with chat and sidebar."""
+    """Global chat page."""
     user = _authenticate_cookie(request)
 
     if user is None:
         return redirect("login")
 
-    return render(request, "chat.html", {})
+    return render(request, "chat.html", {"username": user.username})
 
 
 # Helper functions
