@@ -25,3 +25,26 @@ function initialAnimation() {
     container.style.animation = "rise 0.7s";
 }
 initialAnimation();
+
+// Get element handles
+let textarea = document.querySelector("textarea");
+let send = document.querySelector("#send");
+let messageContainer = document.querySelector("#message-container");
+
+// Add event listeners
+send.addEventListener("click", () => sendMessage(textarea.value));
+
+function sendMessage(text) {
+    let temp = document.getElementsByTagName("template")[0];
+    let msg = temp.content.cloneNode(true);
+    let bubble = msg.querySelector(".message-bubble");
+    bubble.innerText = text;
+    messageContainer.appendChild(msg);
+    messageContainer.scrollIntoView(msg);
+}
+
+let messageCount = 0;
+
+function fetchMessages(count) {
+    // TODO
+}

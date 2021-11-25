@@ -15,7 +15,7 @@
                 <div id="sidebar">
                     <div id="sidebar-header">
                         <div class="photo-bubble"></div>
-                        username
+                        {{ username }}
                     </div>
                     <div class="sidebar-subheader">Channels</div>
                     <div class="sidebar-content">
@@ -29,15 +29,17 @@
                 </div>
                 <div id="chat">
                     <div id="message-container">
-                        <div class="message">
-                            <div class="photo-bubble"></div>
-                            <div class="message-bubble">
-                                asdfasdfad fasdf adsf asdf asdf adsf asdfa
-                                fasdfasdf asdf adsf
+                        <template id="message-template">
+                            <div class="message">
+                                <div class="photo-bubble"></div>
+                                <div class="message-bubble"></div>
                             </div>
-                        </div>
+                        </template>
                     </div>
-                    <textarea></textarea>
+                    <div id="new-message-area">
+                        <textarea></textarea>
+                        <button id="send">Send</button>
+                    </div>
                 </div>
                 <div id="animation-overlay"></div>
             </div>
