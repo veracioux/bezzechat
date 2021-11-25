@@ -9,7 +9,7 @@
     </head>
     <body>
         <span style="font-size: 2em">Register</span>
-        <form action="./submit" method="POST" id="register-form">
+        <form action="./submit/" method="POST" id="register-form">
             {% csrf_token %}
             <label for="username">User name</label>
             <input type="text" id="username" class="text" name="username" />
@@ -20,6 +20,7 @@
                 let csrfToken = "{{ csrf_token }}";
             </script>
         </form>
+        <ul id="errors"></ul>
     </body>
     <script src="{% static 'js/register.js' %}"></script>
 </html>

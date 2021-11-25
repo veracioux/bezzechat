@@ -1,8 +1,6 @@
 """Defines views for the app."""
-from django.core.signing import Signer
-from django.db import IntegrityError
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.http import Http404, JsonResponse
+from django.shortcuts import redirect, render
 
 from .models import User
 
@@ -19,28 +17,49 @@ def register(request):
 
 def register_submit(request):
     """Submit a 'register' form."""
-    user = User()
-    username = request.POST["username"]
-    password = request.POST["password"]
-    if not User.is_username_valid(username):
-        # TODO Return error stating allowed characters
-        pass
+    try:
+        username = request.POST["username"]
+        password = request.POST["password"]
+    except Exception as e:
+        raise Http404 from e
 
+    errors = _register_check(username, password)
+    if errors:
+        raise Http404
+
+    user = User()
     user.username = username
     user.set_password(password)
-    try:
-        user.save()
-    except IntegrityError as e:
-        if str(e).startswith("UNIQUE constraint failed"):
-            # TODO document
-            data = {"errors": ["unique"]}
-            return JsonResponse(data)
+    user.save()
 
-    cookie = f"username={username}; pass={password}"
-    data = {
-        "errors": [],
-        "cookie": Signer().sign(cookie),
-    }
+    resp = redirect("chat")
+    resp.set_signed_cookie("username", username)
+    resp.set_signed_cookie("password", password)
+    return resp
+
+
+def _register_check(username: str, password: str) -> list[str]:
+    """Return a list of errors with the given username and password."""
+    errors = []
+    if not User.is_username_valid(username):
+        errors.append("username_format")
+    if not User.is_password_valid(password):
+        errors.append("password_format")
+    if User.objects.filter(username=username).exists():
+        errors.append("username_not_unique")
+
+    return errors
+
+
+def register_check(request):
+    """Validate register form data and return a JSON with detected errors."""
+    data = {}
+    try:
+        data["errors"] = _register_check(
+            request.POST["username"], request.POST["password"]
+        )
+    except Exception as e:
+        raise Http404 from e
     return JsonResponse(data)
 
 
@@ -56,4 +75,5 @@ def login_submit(_):
 
 def chat(request):
     """The page with chat and sidebar."""
+    print(request.COOKIES)
     return render(request, "chat.html", {})

@@ -13,7 +13,7 @@ class User(models.User):
         return (
             len(username) >= 2
             and len(username) <= 32
-            and re.match("[a-zA-Z0-9_-]", username)
+            and re.match("^[a-zA-Z0-9_-]*$", username)
         )
 
     @staticmethod
