@@ -1,4 +1,4 @@
-let registerForm = document.forms["register-form"];
+let registerForm = document.forms["form"];
 
 function onSubmit(event) {
     event.preventDefault();

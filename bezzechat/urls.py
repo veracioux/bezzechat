@@ -25,6 +25,7 @@ urlpatterns = [
     path("register/check/", views.register_check, name="register_check"),
     path("register/submit/", views.register_submit, name="register_submit"),
     path("login/", views.login, name="login"),
+    path("login/check/", views.login_check, name="login_check"),
     path("login/submit/", views.login_submit, name="login_submit"),
     path("chat/", views.chat, name="chat"),
 ]

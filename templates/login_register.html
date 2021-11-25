@@ -2,14 +2,14 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>BezzeChat</title>
+        <title>{{ title }} | BezzeChat</title>
         {% load static %}
         <link rel="stylesheet" href="{% static 'css/global.css' %}" />
-        <link rel="stylesheet" href="{% static 'css/register.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/login_register.css' %}" />
     </head>
     <body>
-        <span style="font-size: 2em">Register</span>
-        <form action="./submit/" method="POST" id="register-form">
+        <span style="font-size: 2em">{{ title }}</span>
+        <form action="./submit/" method="POST" id="form">
             {% csrf_token %}
             <label for="username">User name</label>
             <input type="text" id="username" class="text" name="username" />
@@ -22,5 +22,9 @@
         </form>
         <ul id="errors"></ul>
     </body>
+    {% if title == "Register" %}
     <script src="{% static 'js/register.js' %}"></script>
+    {% else %}
+    <script src="{% static 'js/login.js' %}"></script>
+    {% endif %}
 </html>

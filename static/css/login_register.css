@@ -8,7 +8,7 @@ body {
     background: #d1c4e9;
 }
 
-#register-form {
+form {
     display: flex;
     flex-direction: column;
     align-items: center;
