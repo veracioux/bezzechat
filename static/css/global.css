@@ -20,7 +20,10 @@ input[type="submit"] {
     border-radius: 50%;
 
     /* TODO just placeholders */
-    min-height: 30px;
-    min-width: 30px;
+    min-height: 1.6em;
+    min-width: 1.6em;
     background: red;
+    display: grid;
+    place-items: center;
+    user-select: none;
 }
