@@ -16,6 +16,11 @@ input[type="submit"] {
     box-shadow: 2px 2px 4px #0005;
 }
 
+button:hover,
+input[type="submit"]:hover {
+    background: #ec407a;
+}
+
 .photo-bubble {
     border-radius: 50%;
 
