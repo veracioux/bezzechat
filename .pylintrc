@@ -1,3 +1,6 @@
+[MASTER]
+ignore=migrations
+
 [BASIC]
 variable-rgx=[a-z0-9_]{1,30}$
 
