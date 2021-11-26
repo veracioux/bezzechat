@@ -24,21 +24,17 @@ function initialAnimation() {
 
     container.style.animation = "rise 0.7s";
 }
-initialAnimation();
 
-// Get element handles
+// Get handles to DOM elements
 let textarea = document.querySelector("textarea");
 let send = document.querySelector("#send");
 let messageContainer = document.querySelector("#message-container");
 
-// Add event listeners
-send.addEventListener("click", () => sendMessage(textarea.value));
-textarea.addEventListener("keypress", (event) => {
-    if (event.key == "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage(textarea.value);
-    }
-});
+let msgMeta = {
+    totalCount: 0,
+    loadedCount: 0,
+};
+var fetchPending = false;
 
 function appendMessageToDOM(content, sender) {
     messageContainer.appendChild(createMessage(content, sender));
@@ -50,9 +46,6 @@ function prependMessagesToDOM(messages) {
         messageContainer.prepend(createMessage(msg.content, msg.sender));
     }
 }
-
-let totalCount = 0;
-let loadedCount = 0;
 
 function sendMessage(text) {
     textarea.value = "";
@@ -71,54 +64,53 @@ function sendMessage(text) {
     });
 }
 
-var resolved = true;
 function fetchMessages(count, callback = () => {}) {
     // Do not fetch until the last request is finished
-    if (!resolved) {
+    if (fetchPending) {
         return;
     }
-    resolved = false;
+    fetchPending = true;
     return fetch(
         "./",
         jsonPostRequest({
             action: "fetch_messages",
-            loadedCount: loadedCount,
+            loadedCount: msgMeta.loadedCount,
             fetchCount: count,
         })
     )
         .then((resp) => resp.json())
         .then((data) => {
-            loadedCount += data.messages.length;
-            totalCount = data.totalCount;
+            msgMeta.loadedCount += data.messages.length;
+            msgMeta.totalCount = data.totalCount;
             prependMessagesToDOM(data.messages);
-            resolved = true;
+            fetchPending = false;
             callback();
         })
         .catch(() => {
-            resolved = true;
+            fetchPending = false;
         });
 }
 
 function fetchNewMessages() {
-    if (!resolved) {
+    if (fetchPending) {
         return;
     }
-    resolved = false;
+    fetchPending = true;
     fetch(
         "./",
         jsonPostRequest({
             action: "fetch_new_messages",
-            totalCount: totalCount,
+            totalCount: msgMeta.totalCount,
         })
     )
         .then((resp) => resp.json())
         .then((data) => {
             console.log(msg.sender);
-            totalCount = data.totalCount;
+            msgMeta.totalCount = data.totalCount;
             for (msg of data.messages) {
                 appendMessageToDOM(msg.content, msg.sender);
             }
-            resolved = true;
+            fetchPending = false;
         });
 }
 
@@ -126,7 +118,7 @@ function fetchUntilScrollBarVisible() {
     fetchMessages(10, () => {
         if (
             messageContainer.scrollHeight <= messageContainer.clientHeight &&
-            loadedCount < totalCount
+            msgMeta.loadedCount < msgMeta.totalCount
         ) {
             fetchUntilScrollBarVisible();
         } else {
@@ -135,13 +127,6 @@ function fetchUntilScrollBarVisible() {
         }
     });
 }
-
-// Initial message fetch
-fetchUntilScrollBarVisible();
-// Start a periodic message refresh
-setInterval(() => {
-    fetchNewMessages();
-}, 2000);
 
 function onFinishInitialLoad() {
     messageContainer.addEventListener("wheel", (event) => {
@@ -179,3 +164,24 @@ function createMessage(content, sender) {
 
     return msg;
 }
+
+////////////
+// SCRIPT //
+////////////
+
+initialAnimation();
+// Initial message fetch
+fetchUntilScrollBarVisible();
+// Start a periodic message refresh
+setInterval(() => {
+    fetchNewMessages();
+}, 2000);
+
+// Add event listeners
+send.addEventListener("click", () => sendMessage(textarea.value));
+textarea.addEventListener("keypress", (event) => {
+    if (event.key == "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage(textarea.value);
+    }
+});
