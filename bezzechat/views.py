@@ -71,7 +71,6 @@ def register_submit(request):
     user.username = username
     user.set_password(password)
     user.save()
-
     return _redirect_to_chat_with_cookie(username, password)
 
 
@@ -214,7 +213,9 @@ def _fetch_online_users(this_user, total_count):
     # TODO currently fetches all registered users
     data = {"users": []}
 
-    query_set = User.objects.exclude(username=this_user.username)
+    query_set = User.objects.exclude(username=this_user.username).order_by(
+        "date_joined"
+    )
     count = query_set.count()
 
     if count > total_count:

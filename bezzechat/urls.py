@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.staticfiles import urls
 from django.urls import path
 
 from . import views
@@ -29,4 +30,4 @@ urlpatterns = [
     path("login/submit/", views.login_submit, name="login_submit"),
     path("chat/", views.chat_global, name="chat_global"),
     path("chat/<str:user>/", views.chat_private, name="chat_private"),
-]
+] + urls.staticfiles_urlpatterns()
