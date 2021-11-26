@@ -1,9 +1,11 @@
 """Defines views for the app."""
+import json
+
 from django.contrib.auth import authenticate
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 
-from .models import User
+from .models import Message, User
 
 
 def index(request):
@@ -25,7 +27,7 @@ def register(request):
 def login(request):
     """Login page for existing users."""
     if _authenticate_cookie(request):
-        return redirect("chat")
+        return redirect("chat_global")
 
     return render(
         request,
@@ -56,7 +58,8 @@ def register_submit(request):
     Otherwise, redirects to a 404 page.
     """
     try:
-        username, password = _login_data(request).items()
+        username = request.POST["username"]
+        password = request.POST["password"]
     except Exception as e:
         raise Http404 from e
 
@@ -92,14 +95,34 @@ def login_submit(request):
     return _redirect_to_chat_with_cookie(**_login_data(request))
 
 
-def chat(request):
-    """Global chat page."""
-    user = _authenticate_cookie(request)
+def chat(request, user):
+    """Private chat with `user` or global chat (if `user` empty)."""
 
-    if user is None:
+    this_user = _authenticate_cookie(request)
+
+    if request.method == "POST":
+        data = json.loads(request.body)
+        if data["action"] == "send_message":
+            return _send_message(this_user, data["text"], user)
+
+        return _fetch_messages(
+            this_user, data["loadedCount"], data["fetchCount"], user
+        )
+
+    if this_user is None:
         return redirect("login")
 
-    return render(request, "chat.html", {"username": user.username})
+    return render(request, "chat.html", {"username": this_user.username})
+
+
+def chat_global(request):
+    """Global chat page."""
+    return chat(request, user="")
+
+
+def chat_private(request, user):
+    """Private chat page with user `user`."""
+    return chat(request, user)
 
 
 # Helper functions
@@ -136,7 +159,38 @@ def _authenticate_cookie(request):
 
 
 def _redirect_to_chat_with_cookie(username, password):
-    resp = redirect("chat")
+    resp = redirect("chat_global")
     resp.set_signed_cookie("username", username)
     resp.set_signed_cookie("password", password)
     return resp
+
+
+def _send_message(this_user, text, user):
+    if not user:
+        # Send to global chat
+        msg = Message(content=text, sender=this_user)
+        msg.save()
+    else:
+        # TODO
+        user = User.objects.get(username=user)
+    return HttpResponse()
+
+
+# TODO remove
+# pylint: disable=unused-argument
+def _fetch_messages(this_user, loaded_count, fetchCount, user):
+    data = {}
+    # if not user:
+    #     channel =
+    # TODO query only target channel
+    query_set = Message.objects.all()  # pylint: disable=no-member
+    messages = query_set.order_by("time_sent").reverse()[0:fetchCount]
+    data["messages"] = [
+        {
+            "content": msg.content,
+            "sender": msg.sender.username,
+        }
+        for msg in messages
+    ]
+    data["totalCount"] = query_set.count()
+    return JsonResponse(data)

@@ -42,8 +42,15 @@
                     </div>
                 </div>
                 <div id="animation-overlay"></div>
+                {% csrf_token %}
+                <script>
+                    var csrfToken = "{{ csrf_token }}";
+                </script>
             </div>
         </div>
     </body>
+    <script>
+        var username = "{{ username }}";
+    </script>
     <script src="{% static 'js/chat.js' %}"></script>
 </html>

@@ -27,5 +27,6 @@ urlpatterns = [
     path("login/", views.login, name="login"),
     path("login/check/", views.login_check, name="login_check"),
     path("login/submit/", views.login_submit, name="login_submit"),
-    path("chat/", views.chat, name="chat"),
+    path("chat/", views.chat_global, name="chat_global"),
+    path("chat/<str:user>/", views.chat_private, name="chat_private"),
 ]

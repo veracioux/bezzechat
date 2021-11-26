@@ -34,17 +34,70 @@ let messageContainer = document.querySelector("#message-container");
 // Add event listeners
 send.addEventListener("click", () => sendMessage(textarea.value));
 
-function sendMessage(text) {
+function createMessage(content, sender) {
     let temp = document.getElementsByTagName("template")[0];
     let msg = temp.content.cloneNode(true);
-    let bubble = msg.querySelector(".message-bubble");
-    bubble.innerText = text;
-    messageContainer.appendChild(msg);
-    messageContainer.scrollIntoView(msg);
+    let messageBubble = msg.querySelector(".message-bubble");
+    let photoBubble = msg.querySelector(".photo-bubble");
+    messageBubble.innerText = content;
+    photoBubble.innerText = sender[0];
+
+    return msg;
 }
 
-let messageCount = 0;
+function appendMessageToDOM(content, sender) {
+    messageContainer.appendChild(createMessage(content, sender));
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+}
+
+function prependMessagesToDOM(messages) {
+    for (msg of messages) {
+        messageContainer.prepend(createMessage(msg.content, msg.sender));
+    }
+}
+
+let totalCount = 0;
+let loadedCount = 0;
+
+function sendMessage(text) {
+    fetch(
+        "./",
+        jsonPostRequest({
+            action: "send_message",
+            text: text,
+        })
+    ).then((resp) => {
+        appendMessageToDOM(text, username);
+    });
+}
 
 function fetchMessages(count) {
-    // TODO
+    fetch(
+        "./",
+        jsonPostRequest({
+            action: "fetch_messages",
+            totalCount: totalCount,
+            loadedCount: loadedCount,
+            fetchCount: count,
+        })
+    )
+        .then((resp) => resp.json())
+        .then((data) => {
+            prependMessagesToDOM(data.messages);
+        });
 }
+
+// Helper functions
+
+function jsonPostRequest(data) {
+    return {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify(data),
+    };
+}
+
+fetchMessages(10);
