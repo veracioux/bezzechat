@@ -28,6 +28,7 @@ input[type="submit"]:hover {
     min-height: 1.6em;
     min-width: 1.6em;
     background: #d1c4e9;
+    color: black;
     display: grid;
     place-items: center;
     user-select: none;

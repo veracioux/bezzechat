@@ -26,15 +26,26 @@ function initialAnimation() {
 }
 
 // Get handles to DOM elements
+let usersGroup = document.getElementById("users-group");
 let textarea = document.querySelector("textarea");
-let send = document.querySelector("#send");
+let send = document.getElementById("send");
 let messageContainer = document.querySelector("#message-container");
 
+let usersMeta = {
+    totalCount: 0,
+    loadedCount: 0,
+};
 let msgMeta = {
     totalCount: 0,
     loadedCount: 0,
 };
 var fetchPending = false;
+
+function appendUsersToDOM(usernames) {
+    for (username of usernames) {
+        usersGroup.append(createUser(username));
+    }
+}
 
 function appendMessageToDOM(content, sender) {
     messageContainer.appendChild(createMessage(content, sender));
@@ -48,6 +59,9 @@ function prependMessagesToDOM(messages) {
 }
 
 function sendMessage(text) {
+    if (!text) {
+        return;
+    }
     textarea.value = "";
     fetch(
         "./",
@@ -62,6 +76,22 @@ function sendMessage(text) {
             textarea.value = text;
         }
     });
+}
+
+function fetchUsers(callback = () => {}) {
+    fetch(
+        "./",
+        jsonPostRequest({
+            action: "fetch_online_users",
+            totalCount: usersMeta.totalCount,
+        })
+    )
+        .then((resp) => resp.json())
+        .then((data) => {
+            usersMeta.totalCount += data.users.length;
+            appendUsersToDOM(data.users);
+            callback(data.users);
+        });
 }
 
 function fetchMessages(count, callback = () => {}) {
@@ -105,7 +135,6 @@ function fetchNewMessages() {
     )
         .then((resp) => resp.json())
         .then((data) => {
-            console.log(msg.sender);
             msgMeta.totalCount = data.totalCount;
             for (msg of data.messages) {
                 appendMessageToDOM(msg.content, msg.sender);
@@ -153,8 +182,7 @@ function jsonPostRequest(data) {
 }
 
 function createMessage(content, sender) {
-    console.log(content, sender);
-    let temp = document.getElementsByTagName("template")[0];
+    let temp = document.getElementById("message-template");
     let msg = temp.content.cloneNode(true);
     let messageBubble = msg.querySelector(".message-bubble");
     let photoBubble = msg.querySelector(".photo-bubble");
@@ -167,17 +195,33 @@ function createMessage(content, sender) {
     return msg;
 }
 
+function createUser(username) {
+    let temp = document.getElementById("user-template");
+    let user = temp.content.cloneNode(true);
+    let button = user.querySelector(".user-button");
+    button.innerText = username;
+
+    return user;
+}
+
 ////////////
 // SCRIPT //
 ////////////
 
 initialAnimation();
+// Fetch active users immediately and periodically
+fetchUsers();
+setInterval(() => {
+    fetchUsers((users) => {
+        /* if (users.length) {
+         *     alert(users);
+         * } */
+    });
+}, 5000);
 // Initial message fetch
 fetchUntilScrollBarVisible();
 // Start a periodic message refresh
-setInterval(() => {
-    fetchNewMessages();
-}, 2000);
+setInterval(fetchNewMessages, 2000);
 
 // Add event listeners
 send.addEventListener("click", () => sendMessage(textarea.value));

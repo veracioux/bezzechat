@@ -108,6 +108,8 @@ def chat(request, user):
             return _fetch_messages(
                 this_user, data["loadedCount"], data["fetchCount"], user
             )
+        if data["action"] == "fetch_online_users":
+            return _fetch_online_users(this_user, data["totalCount"])
         return _fetch_new_messages(this_user, data["totalCount"], user)
 
     if this_user is None:
@@ -200,10 +202,24 @@ def _fetch_new_messages(this_user, total_count, channel):
     count = query_set.count()
 
     if count > total_count:
-        delta = count - total_count
-        messages = query_set.order_by("time_sent")[count - delta :]
+        messages = query_set.order_by("time_sent")[total_count:]
         data["messages"] = [msg.json() for msg in messages]
 
     data["totalCount"] = count
+
+    return JsonResponse(data)
+
+
+def _fetch_online_users(this_user, total_count):
+    # TODO currently fetches all registered users
+    data = {"users": []}
+
+    query_set = User.objects.exclude(username=this_user.username)
+    count = query_set.count()
+
+    if count > total_count:
+        data["users"] = list(
+            query_set.values_list("username", flat=True)[total_count:]
+        )
 
     return JsonResponse(data)
