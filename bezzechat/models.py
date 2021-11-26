@@ -8,6 +8,8 @@ from django.db import models
 class User(auth.User):
     """Extension of auth user model for the purposes of BezzeChat."""
 
+    online = models.BooleanField(default=True)
+
     @staticmethod
     def is_username_valid(username):
         """Test if `username` consists of valid characters."""
@@ -53,3 +55,10 @@ class Message(models.Model):
     # )
     content = models.CharField(max_length=300)
     time_sent = models.DateTimeField(auto_now=True)
+
+    def json(self):
+        """Get a JSON representation of the message."""
+        return {
+            "content": self.content,
+            "sender": self.sender.username,  # pylint: disable=no-member
+        }

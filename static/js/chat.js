@@ -33,18 +33,12 @@ let messageContainer = document.querySelector("#message-container");
 
 // Add event listeners
 send.addEventListener("click", () => sendMessage(textarea.value));
-
-function createMessage(content, sender) {
-    let temp = document.getElementsByTagName("template")[0];
-    let msg = temp.content.cloneNode(true);
-    let messageBubble = msg.querySelector(".message-bubble");
-    let photoBubble = msg.querySelector(".photo-bubble");
-    messageBubble.innerText = content;
-    photoBubble.title = sender;
-    photoBubble.innerText = sender[0];
-
-    return msg;
-}
+textarea.addEventListener("keypress", (event) => {
+    if (event.key == "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage(textarea.value);
+    }
+});
 
 function appendMessageToDOM(content, sender) {
     messageContainer.appendChild(createMessage(content, sender));
@@ -61,6 +55,7 @@ let totalCount = 0;
 let loadedCount = 0;
 
 function sendMessage(text) {
+    textarea.value = "";
     fetch(
         "./",
         jsonPostRequest({
@@ -68,10 +63,11 @@ function sendMessage(text) {
             text: text,
         })
     ).then((resp) => {
-        totalCount++;
-        loadedCount++;
-        textarea.value = "";
-        appendMessageToDOM(text, username);
+        if (resp.ok) {
+            fetchNewMessages();
+        } else {
+            textarea.value = text;
+        }
     });
 }
 
@@ -86,7 +82,6 @@ function fetchMessages(count, callback = () => {}) {
         "./",
         jsonPostRequest({
             action: "fetch_messages",
-            totalCount: totalCount,
             loadedCount: loadedCount,
             fetchCount: count,
         })
@@ -100,6 +95,29 @@ function fetchMessages(count, callback = () => {}) {
             callback();
         })
         .catch(() => {
+            resolved = true;
+        });
+}
+
+function fetchNewMessages() {
+    if (!resolved) {
+        return;
+    }
+    resolved = false;
+    fetch(
+        "./",
+        jsonPostRequest({
+            action: "fetch_new_messages",
+            totalCount: totalCount,
+        })
+    )
+        .then((resp) => resp.json())
+        .then((data) => {
+            console.log(msg.sender);
+            totalCount = data.totalCount;
+            for (msg of data.messages) {
+                appendMessageToDOM(msg.content, msg.sender);
+            }
             resolved = true;
         });
 }
@@ -120,6 +138,10 @@ function fetchUntilScrollBarVisible() {
 
 // Initial message fetch
 fetchUntilScrollBarVisible();
+// Start a periodic message refresh
+setInterval(() => {
+    fetchNewMessages();
+}, 2000);
 
 function onFinishInitialLoad() {
     messageContainer.addEventListener("wheel", (event) => {
@@ -143,4 +165,17 @@ function jsonPostRequest(data) {
         },
         body: JSON.stringify(data),
     };
+}
+
+function createMessage(content, sender) {
+    console.log(content, sender);
+    let temp = document.getElementsByTagName("template")[0];
+    let msg = temp.content.cloneNode(true);
+    let messageBubble = msg.querySelector(".message-bubble");
+    let photoBubble = msg.querySelector(".photo-bubble");
+    messageBubble.innerText = content;
+    photoBubble.title = sender;
+    photoBubble.innerText = sender[0];
+
+    return msg;
 }

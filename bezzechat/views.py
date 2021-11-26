@@ -104,10 +104,11 @@ def chat(request, user):
         data = json.loads(request.body)
         if data["action"] == "send_message":
             return _send_message(this_user, data["text"], user)
-
-        return _fetch_messages(
-            this_user, data["loadedCount"], data["fetchCount"], user
-        )
+        if data["action"] == "fetch_messages":
+            return _fetch_messages(
+                this_user, data["loadedCount"], data["fetchCount"], user
+            )
+        return _fetch_new_messages(this_user, data["totalCount"], user)
 
     if this_user is None:
         return redirect("login")
@@ -187,12 +188,22 @@ def _fetch_messages(this_user, loaded_count, fetch_count, user):
     messages = query_set.order_by("time_sent").reverse()[
         loaded_count : loaded_count + fetch_count
     ]
-    data["messages"] = [
-        {
-            "content": msg.content,
-            "sender": msg.sender.username,
-        }
-        for msg in messages
-    ]
+    data["messages"] = [msg.json() for msg in messages]
     data["totalCount"] = query_set.count()
+    return JsonResponse(data)
+
+
+def _fetch_new_messages(this_user, total_count, channel):
+    # TODO filter by channel
+    data = dict(messages=[])
+    query_set = Message.objects.all()  # pylint: disable=no-member
+    count = query_set.count()
+
+    if count > total_count:
+        delta = count - total_count
+        messages = query_set.order_by("time_sent")[count - delta :]
+        data["messages"] = [msg.json() for msg in messages]
+
+    data["totalCount"] = count
+
     return JsonResponse(data)
