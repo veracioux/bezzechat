@@ -160,7 +160,9 @@ function createMessage(content, sender) {
     let photoBubble = msg.querySelector(".photo-bubble");
     messageBubble.innerText = content;
     photoBubble.title = sender;
-    photoBubble.innerText = sender[0];
+    if (sender) {
+        photoBubble.innerText = sender[0];
+    }
 
     return msg;
 }

@@ -1,9 +1,7 @@
 #sidebar {
     display: flex;
     flex-direction: column;
-
-    /* TODO */
-    width: 400px;
+    width: 20em;
     background: #eee;
     box-shadow: 2px 0 4px #0003;
     z-index: 2;
@@ -29,12 +27,13 @@
 .sidebar-content {
     display: flex;
     flex-direction: column;
-    padding: 0.5em;
+    padding: 1em;
 }
 
 #users-group {
     display: flex;
     flex-direction: column;
+    gap: 0.4em;
 }
 
 .sidebar-content button {

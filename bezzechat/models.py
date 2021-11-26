@@ -45,6 +45,7 @@ class ChatChannel(models.Model):
     )
 
 
+# pylint: disable=no-member
 class Message(models.Model):
     """A chat message."""
 
@@ -60,5 +61,5 @@ class Message(models.Model):
         """Get a JSON representation of the message."""
         return {
             "content": self.content,
-            "sender": self.sender.username,  # pylint: disable=no-member
+            "sender": self.sender.username if self.sender else "",
         }

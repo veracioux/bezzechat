@@ -32,11 +32,7 @@ form {
 }
 
 #errors {
-    background: red;
     display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 input[type="submit"] {
