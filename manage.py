@@ -17,6 +17,16 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
+    # If there is no global chat channel, create it
+    if len(sys.argv) >= 2 and sys.argv[1] == "migrate":
+        from bezzechat.models import ChatChannel
+        try:
+            g = ChatChannel.objects.get(name="Global")
+        except ChatChannel.DoesNotExist:
+            ch = ChatChannel(name="Global")
+            ch.save()
+            print("Created Global channel.")
+
 
 if __name__ == "__main__":
     main()
