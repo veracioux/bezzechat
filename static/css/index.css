@@ -2,8 +2,16 @@
     display: flex;
     flex-direction: column;
     gap: 1em;
-    font-size: 2em;
     text-align: center;
+}
+
+#title {
+    font-size: 2.5em;
+}
+
+#subtitle {
+    opacity: 0.5;
+    font-size: 0.8em;
 }
 
 #signin-form {

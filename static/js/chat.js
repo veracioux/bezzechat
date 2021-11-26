@@ -25,11 +25,14 @@ function initialAnimation() {
     container.style.animation = "rise 0.7s";
 }
 
+function animateNewUser() {}
+
 // Get handles to DOM elements
 let usersGroup = document.getElementById("users-group");
 let textarea = document.querySelector("textarea");
 let send = document.getElementById("send");
 let messageContainer = document.querySelector("#message-container");
+let notification = document.getElementById("notification");
 
 let usersMeta = {
     totalCount: 0,
@@ -210,14 +213,23 @@ function createUser(username) {
 
 initialAnimation();
 // Fetch active users immediately and periodically
-fetchUsers();
-setInterval(() => {
-    fetchUsers((users) => {
-        /* if (users.length) {
-         *     alert(users);
-         * } */
-    });
-}, 5000);
+fetchUsers(() => {
+    let notificationTimeout = 0;
+    setInterval(() => {
+        fetchUsers((users) => {
+            if (users.length) {
+                let lastUser = users[users.length - 1];
+                notification.innerHTML = `User <b>${lastUser}</b> joined the chat.`;
+                notification.style.display = "block";
+                window.clearTimeout(notificationTimeout);
+                notificationTimeout = setTimeout(() => {
+                    notification.style.display = "none";
+                    notificationTimeout = 0;
+                }, 10000);
+            }
+        });
+    }, 5000);
+});
 // Initial message fetch
 fetchUntilScrollBarVisible();
 // Start a periodic message refresh
