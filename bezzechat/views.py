@@ -178,13 +178,15 @@ def _send_message(this_user, text, user):
 
 # TODO remove
 # pylint: disable=unused-argument
-def _fetch_messages(this_user, loaded_count, fetchCount, user):
+def _fetch_messages(this_user, loaded_count, fetch_count, user):
     data = {}
     # if not user:
     #     channel =
     # TODO query only target channel
     query_set = Message.objects.all()  # pylint: disable=no-member
-    messages = query_set.order_by("time_sent").reverse()[0:fetchCount]
+    messages = query_set.order_by("time_sent").reverse()[
+        loaded_count : loaded_count + fetch_count
+    ]
     data["messages"] = [
         {
             "content": msg.content,

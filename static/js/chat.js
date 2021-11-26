@@ -40,6 +40,7 @@ function createMessage(content, sender) {
     let messageBubble = msg.querySelector(".message-bubble");
     let photoBubble = msg.querySelector(".photo-bubble");
     messageBubble.innerText = content;
+    photoBubble.title = sender;
     photoBubble.innerText = sender[0];
 
     return msg;
@@ -67,12 +68,21 @@ function sendMessage(text) {
             text: text,
         })
     ).then((resp) => {
+        totalCount++;
+        loadedCount++;
+        textarea.value = "";
         appendMessageToDOM(text, username);
     });
 }
 
-function fetchMessages(count) {
-    fetch(
+var resolved = true;
+function fetchMessages(count, callback = () => {}) {
+    // Do not fetch until the last request is finished
+    if (!resolved) {
+        return;
+    }
+    resolved = false;
+    return fetch(
         "./",
         jsonPostRequest({
             action: "fetch_messages",
@@ -83,8 +93,43 @@ function fetchMessages(count) {
     )
         .then((resp) => resp.json())
         .then((data) => {
+            loadedCount += data.messages.length;
+            totalCount = data.totalCount;
             prependMessagesToDOM(data.messages);
+            resolved = true;
+            callback();
+        })
+        .catch(() => {
+            resolved = true;
         });
+}
+
+function fetchUntilScrollBarVisible() {
+    fetchMessages(10, () => {
+        if (
+            messageContainer.scrollHeight <= messageContainer.clientHeight &&
+            loadedCount < totalCount
+        ) {
+            fetchUntilScrollBarVisible();
+        } else {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            onFinishInitialLoad();
+        }
+    });
+}
+
+// Initial message fetch
+fetchUntilScrollBarVisible();
+
+function onFinishInitialLoad() {
+    messageContainer.addEventListener("wheel", (event) => {
+        if (
+            event.deltaY / event.target.clientHeight < -0.4 &&
+            event.target.scrollTop == 0
+        ) {
+            fetchMessages(10, () => (event.target.scrollTop = 0));
+        }
+    });
 }
 
 // Helper functions
@@ -99,5 +144,3 @@ function jsonPostRequest(data) {
         body: JSON.stringify(data),
     };
 }
-
-fetchMessages(10);
